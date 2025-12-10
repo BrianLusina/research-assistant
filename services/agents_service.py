@@ -16,7 +16,27 @@ FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_KEY")
 
 extracted_links = []
 
-# Task 3: Add Firecrawl Search function here
+def firecrawl_search(query: str):
+    response = requests.get(f"https://api.firecrawl.dev/v1/search?query={query}", headers={"Authorization": f"Bearer {FIRECRAWL_API_KEY}"})
 
+    if response.status_code == 200:
+        try:
+            json_data = response.json()
+            results = json_data.get("results", [])
+            if results:
+                for result in results:
+                    url = result.get("url")
+                    if url:
+                        extracted_links.append(url)
+                return response.text
+        except Exception:
+            # TODO: log exception
+            pass
+
+    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, temperature=0.3)
+    fallback_response = llm.invoke([
+        HumanMessage(content=f"Please provide a clear explanation about: {query}. Include definition, features, and common use cases.")
+    ])
+    return fallback_response.content
 
 # Task 5: Implement Researcher, Summarizer, and presenter Agents
