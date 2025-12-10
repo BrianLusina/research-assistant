@@ -36,3 +36,8 @@ API key and add it to the `.env` file like below:
 FIRECRAWL_KEY="<your_firecrawl_api_key>"
 ```
 
+> Note: While Firecrawl is powerful and easy to use, it may not always return complete or highly relevant results 
+> depending on the topic. In such cases, or for more customized control, you may consider alternatives such as:
+> SerpAPI: Structured Google search results
+> Tavily API: Clean summaries and metadata for queries
+ 
