@@ -39,4 +39,9 @@ def firecrawl_search(query: str):
     ])
     return fallback_response.content
 
-# Task 5: Implement Researcher, Summarizer, and presenter Agents
+# Register firecrawl search as a tool
+firecrawl_tool = Tool(
+    name="FirecrawlSearch",
+    description="Search the web using Firecrawl API and return HTML content or fallback LLM answer.",
+    func=firecrawl_search,
+)
