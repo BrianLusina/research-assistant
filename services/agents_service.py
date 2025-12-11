@@ -1,10 +1,11 @@
 """
 Contains the CrewAI agent definitions and their task flow setup using LangChain tools and OpenAI.
 """
+import os
+from typing import Tuple
 from crewai import Crew, Agent, Task
 from langchain_openai import ChatOpenAI
 from langchain.tools import Tool
-import os
 import requests
 from dotenv import load_dotenv
 
@@ -16,7 +17,7 @@ FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_KEY")
 
 extracted_links = []
 
-def firecrawl_search(query: str):
+def firecrawl_search(query: str) -> str:
     response = requests.get(f"https://api.firecrawl.dev/v1/search?query={query}", headers={"Authorization": f"Bearer {FIRECRAWL_API_KEY}"})
 
     if response.status_code == 200:
@@ -47,7 +48,7 @@ firecrawl_tool = Tool(
 )
 
 
-def setup_agents_and_tasks(query: str, breadth: int, depth: int):
+def setup_agents_and_tasks(query: str, breadth: int, depth: int) -> Tuple[Crew, Agent, Tool]:
     """
     This function sets up a multi-stage AI workflow involving three specialized agents, Researcher, Summarizer, and
     Presenter, to conduct deep web research, summarize the findings, and generate a polished final report.
