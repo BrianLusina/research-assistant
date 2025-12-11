@@ -5,7 +5,8 @@ import os
 from typing import Tuple
 from crewai import Crew, Agent, Task
 from langchain_openai import ChatOpenAI
-from langchain.tools import Tool
+from langchain.tools import tool
+from langchain_core.messages import HumanMessage
 import requests
 from dotenv import load_dotenv
 
@@ -17,7 +18,15 @@ FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_KEY")
 
 extracted_links = []
 
+@tool
 def firecrawl_search(query: str) -> str:
+    """
+    Search the web using Firecrawl API and return HTML content or fallback LLM answer.
+    Args:
+        query(str): the query to use to perform a search
+    Returns:
+        str: Response from a query search
+    """
     response = requests.get(f"https://api.firecrawl.dev/v1/search?query={query}", headers={"Authorization": f"Bearer {FIRECRAWL_API_KEY}"})
 
     if response.status_code == 200:
@@ -34,21 +43,14 @@ def firecrawl_search(query: str) -> str:
             # TODO: log exception
             pass
 
-    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, temperature=0.3)
+    llm = ChatOpenAI(api_key=OPENAI_API_KEY, temperature=0.3)
     fallback_response = llm.invoke([
         HumanMessage(content=f"Please provide a clear explanation about: {query}. Include definition, features, and common use cases.")
     ])
     return fallback_response.content
 
-# Register firecrawl search as a tool
-firecrawl_tool = Tool(
-    name="FirecrawlSearch",
-    description="Search the web using Firecrawl API and return HTML content or fallback LLM answer.",
-    func=firecrawl_search,
-)
 
-
-def setup_agents_and_tasks(query: str, breadth: int, depth: int) -> Tuple[Crew, Agent, Tool]:
+def setup_agents_and_tasks(query: str, breadth: int, depth: int) -> Tuple[Crew, Agent]:
     """
     This function sets up a multi-stage AI workflow involving three specialized agents, Researcher, Summarizer, and
     Presenter, to conduct deep web research, summarize the findings, and generate a polished final report.
@@ -59,14 +61,14 @@ def setup_agents_and_tasks(query: str, breadth: int, depth: int) -> Tuple[Crew, 
     Returns:
 
     """
-    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, temperature=0.3)
+    llm = ChatOpenAI(api_key=OPENAI_API_KEY, temperature=0.3)
 
     researcher = Agent(
         name="Research Agent",
         role="Web searcher and data collector",
         goal="Conduct deep recursive web research",
         backstory="Expert in online information mining and query generation",
-        tools=[firecrawl_tool],
+        tools=[firecrawl_search],
         llm=llm,
         verbose=True,
         allow_delegation=False
@@ -120,4 +122,4 @@ def setup_agents_and_tasks(query: str, breadth: int, depth: int) -> Tuple[Crew, 
         max_time=300
     )
 
-    return crew, researcher, firecrawl_tool
+    return crew, researcher

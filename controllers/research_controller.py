@@ -23,7 +23,7 @@ def run_deep_research(query: str, breadth: int, depth: int) -> Tuple[str, bytes,
     Returns:
         tuple with the cleaned output, PDF data and base64 encoded PDF
     """
-    crew, researcher_tool, firecrawl_tool = setup_agents_and_tasks(query, breadth, depth)
+    crew, researcher_tool = setup_agents_and_tasks(query, breadth, depth)
     result = crew.kickoff()
     raw_output = result.output if hasattr(result, 'output') else str(result)
     cleaned_output = clean_markdown(raw_output)
