@@ -3,6 +3,7 @@ Provides utility functions to clean and preprocess markdown text from the agentâ
 """
 import re
 
+
 def clean_markdown(md_text: str) -> str:
     """
     Takes md_text as a parameter and removes Markdown syntax such as #, **, *, and backticks ` from the text. This
