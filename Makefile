@@ -39,6 +39,10 @@ PORT ?= 8000
 run: ## Runs application
 	cd src && python app/main.py
 
+.PHONY: run-streamlit
+run-streamlit: ## runs the Streamlit GUI
+	streamlit run main.py
+
 .PHONY: test
 test: ## Runs tests
 	uv run pytest -vv -s -o log_cli=true -o log_cli_level=DEBUG -o cache_dir=/tmp tests/$(test)
