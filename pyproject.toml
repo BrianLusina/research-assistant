@@ -17,6 +17,6 @@ dependencies = [
 
 [dependency-groups]
 lint = [
-    "pyrefly>=0.45.2",
+    "pyrefly>=0.60.2",
     "ruff>=0.14.8",
 ]
